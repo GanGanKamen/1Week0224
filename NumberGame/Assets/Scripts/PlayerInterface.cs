@@ -66,7 +66,7 @@ namespace Player
                     mousePos.y < touchLimitRangeY.x ||
                     mousePos.y > touchLimitRangeY.y) return;
                 controllerObject.SetActive(true);
-                startPosition = mousePos;
+                startPosition = new Vector2(0.5f,0.5f);
                 isPress = true;
             }
 
@@ -106,7 +106,7 @@ namespace Player
                 }
             }
 
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonUp(0) && isPress)
             {
                 IconSizeReset();
                 controllerObject.SetActive(false);
