@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class StageManager : MonoBehaviour
 {
+    public GameObject socreSender;
+    [SerializeField] private AudioSource bgm;
     public int RemainingTime { get { return GetRemainTime(); } }
     [SerializeField] private Player.NumberManager numberManager;
     [SerializeField] private GameObject uIManager;
@@ -33,6 +35,8 @@ public class StageManager : MonoBehaviour
         {
             yield return null;
         }
+        bgm.loop = true;
+        bgm.Play();
         uIManager.SetActive(true);
         gameStart = true;
         int randomNum = Random.Range(0, straightSpawnPoints.Length);
@@ -64,10 +68,18 @@ public class StageManager : MonoBehaviour
 
             EnemyAdvent();
 
-            if(elapsedTime >= totalTime)
+            if(elapsedTime > totalTime && gameStart)
             {
                 elapsedTime = totalTime;
                 gameStart = false;
+                foreach(GameObject gameObject in GameObject.FindGameObjectsWithTag("Enemy"))
+                {
+                    Destroy(gameObject);
+                }
+                bgm.Stop();
+                var obj = Instantiate(socreSender,transform.position,Quaternion.identity);
+                obj.GetComponent<ScoreSender>().score = numberManager.score;
+                Fader.FadeInBlack(1f, "Result");
             }
         }
     }
