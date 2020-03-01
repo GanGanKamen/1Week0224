@@ -21,6 +21,7 @@ public class SpawnPoint : MonoBehaviour
     {
         GameObject enemyObj = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
         var enemy = enemyObj.GetComponent<Enemy>();
+        enemy.SetLevel(level);
         float speed = 0;
         switch (enemyType)
         {
@@ -31,13 +32,13 @@ public class SpawnPoint : MonoBehaviour
                         speed = 2f;
                         break;
                     case 1:
-                        speed = 2f;
+                        speed = 4f;
                         break;
                     case 2:
-                        speed = 3f;
+                        speed = 5f;
                         break;
                     case 3:
-                        speed = 4f;
+                        speed = 5f;
                         break;
                 }
                 if (transform.position.x > 0) enemy.InitStraight(speed, -1);
@@ -45,15 +46,46 @@ public class SpawnPoint : MonoBehaviour
                 break;
             case EnemyType.Sin:
                 float hight = 0;
+                int direction = 0;
                 if(transform.position.y > 0)
-                {
-                    hight = 6;
-                }
-                else
                 {
                     hight = -6;
                 }
-                enemy.InitSin(hight);
+                else
+                {
+                    hight = 6;
+                }
+
+                if(transform.position.x > 0)
+                {
+                    direction = -1;
+                }
+                else
+                {
+                    direction = 1;
+                }
+                enemy.InitSin(hight,direction);
+                break;
+            case EnemyType.Goal:
+                var goal = GameObject.FindGameObjectWithTag("Collecter").transform.position.y;
+                switch (level)
+                {
+                    default:
+                        speed = 4f;
+                        break;
+                    case 3:
+                        speed = 6f;
+                        break;
+                }
+                if(transform.position.y > 0)
+                {
+                    goal = Mathf.Abs(goal);
+                }
+                else
+                {
+                    goal = -Mathf.Abs(goal);
+                }
+                enemy.InitGoal(transform.position, new Vector3(0,goal,0), speed);
                 break;
         }
     }

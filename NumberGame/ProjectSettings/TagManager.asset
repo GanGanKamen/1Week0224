@@ -5,6 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - UICamera
+  - FxTemporaire
+  - Collecter
+  - Enemy
   layers:
   - Default
   - TransparentFX

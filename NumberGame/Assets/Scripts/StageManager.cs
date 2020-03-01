@@ -4,26 +4,44 @@ using UnityEngine;
 
 public class StageManager : MonoBehaviour
 {
+    public int RemainingTime { get { return GetRemainTime(); } }
+    [SerializeField] private Player.NumberManager numberManager;
+    [SerializeField] private GameObject uIManager;
     [SerializeField] private SpawnPoint[] straightSpawnPoints;
     [SerializeField] private SpawnPoint[] sinSpawnPoints;
+    [SerializeField] private SpawnPoint[] goalSpawnPoints;
     private bool gameStart = false;
     [SerializeField] private int totalTime = 60;
     [SerializeField]private float elapsedTime = 0;
-    private int waveLevel = 1;
+    public int waveLevel = 1;
     private float adventCount = 0;
     // Start is called before the first frame update
     void Start()
     {
-        gameStart = true;
-        int randomNum = Random.Range(0, straightSpawnPoints.Length);
-        straightSpawnPoints[randomNum].EnemySpawn(EnemyType.Straight, waveLevel);
+        StartCoroutine(GameStart());
     }
 
     // Update is called once per frame
     void Update()
     {
         TimeVent();
+    }
 
+    private IEnumerator GameStart()
+    {
+        while(numberManager.isApp == false)
+        {
+            yield return null;
+        }
+        uIManager.SetActive(true);
+        gameStart = true;
+        int randomNum = Random.Range(0, straightSpawnPoints.Length);
+        straightSpawnPoints[randomNum].EnemySpawn(EnemyType.Straight, waveLevel);
+    }
+
+    private int GetRemainTime()
+    {
+        return totalTime - (int)elapsedTime;
     }
 
     private void TimeVent()
@@ -35,7 +53,7 @@ public class StageManager : MonoBehaviour
             {
                 waveLevel = 3;
             }
-            else if(elapsedTime >= 10 && elapsedTime < 40)
+            else if(elapsedTime >= 10 && elapsedTime < 30)
             {
                 waveLevel = 2;
             }
@@ -63,18 +81,18 @@ public class StageManager : MonoBehaviour
                 if(adventCount >= 2)
                 {
                     adventCount = 0;
-                    Debug.Log("Advent2");
+                    RandomAdvent();
                 }
                 break;
             case 3:
                 if (adventCount >= 1)
                 {
                     adventCount = 0;
-                    Debug.Log("Advent3");
+                    AllAdvent();
                 }
                 break;
             default:
-                if (adventCount >= 4)
+                if (adventCount >= 2)
                 {
                     RandomAdvent();
                 }
@@ -85,10 +103,11 @@ public class StageManager : MonoBehaviour
     private void RandomAdvent()
     {
         adventCount = 0;
+        int type = 0;
         switch (waveLevel)
         {
-            default:
-                int type = Random.Range(0, 2);
+            case 1:
+                type = Random.Range(0, 2);
                 if(type == 0)
                 {
                     int randomNum = Random.Range(0, straightSpawnPoints.Length);
@@ -96,11 +115,39 @@ public class StageManager : MonoBehaviour
                 }
                 else
                 {
+                    int randomNum = Random.Range(0, goalSpawnPoints.Length);
+                    goalSpawnPoints[randomNum].EnemySpawn(EnemyType.Goal, waveLevel);
+                }
+                break;
+            case 2:
+                type = Random.Range(0, 3);
+                if (type == 0)
+                {
+                    int randomNum = Random.Range(0, straightSpawnPoints.Length);
+                    straightSpawnPoints[randomNum].EnemySpawn(EnemyType.Straight, waveLevel);
+                }
+                else if(type == 1)
+                {
                     int randomNum = Random.Range(0, sinSpawnPoints.Length);
                     sinSpawnPoints[randomNum].EnemySpawn(EnemyType.Sin, waveLevel);
+                }
+                else
+                {
+                    int randomNum = Random.Range(0, goalSpawnPoints.Length);
+                    goalSpawnPoints[randomNum].EnemySpawn(EnemyType.Goal, waveLevel);
                 }
                 break;
         }
         
+    }
+
+    private void AllAdvent()
+    {
+        int straightRandom = Random.Range(0, straightSpawnPoints.Length);
+        int sinRandom = Random.Range(0, sinSpawnPoints.Length);
+        int goalRandom = Random.Range(0, goalSpawnPoints.Length);
+        straightSpawnPoints[straightRandom].EnemySpawn(EnemyType.Straight, waveLevel);
+        sinSpawnPoints[sinRandom].EnemySpawn(EnemyType.Sin, waveLevel);
+        goalSpawnPoints[goalRandom].EnemySpawn(EnemyType.Goal, waveLevel);
     }
 }
